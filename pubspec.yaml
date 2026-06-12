@@ -1,6 +1,6 @@
 name: remarkaflutter
 description: "A plug-and-play Flutter feedback service with shake detection, screenshots and log capturing."
-version: 0.2.0
+version: 0.2.1
 homepage: https://remarka.tsoftfactory.com
 
 environment:
