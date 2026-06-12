@@ -1,15 +1,21 @@
 name: remarkaflutter
-description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+description: "A plug-and-play Flutter feedback service with shake detection, screenshots and log capturing."
+version: 0.2.0
+homepage: https://remarka.tsoftfactory.com
 
 environment:
   sdk: ^3.12.0
   flutter: ">=1.17.0"
 
 dependencies:
+  connectivity_plus: ^7.1.1
   flutter:
     sdk: flutter
+  http: ^1.6.0
+  image: ^4.8.0
+  screenshot: ^3.0.0
+  shake: ^3.0.0
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
@@ -22,16 +28,8 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
 
-  # To add assets to your package, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
-  #
-  # For details regarding assets in packages, see
-  # https://flutter.dev/to/asset-from-package
-  #
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/to/resolution-aware-images
+  assets:
+    - assets/shake.png
 
   # To add custom fonts to your package, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
