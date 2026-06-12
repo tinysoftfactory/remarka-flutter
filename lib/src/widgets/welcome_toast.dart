@@ -55,7 +55,8 @@ class _WelcomeToastState extends State<WelcomeToast>
 
   @override
   Widget build(BuildContext context) {
-    final icon = widget.icon ??
+    final icon =
+        widget.icon ??
         AnimatedBuilder(
           animation: _shake,
           builder: (context, child) => Transform.translate(
@@ -83,35 +84,38 @@ class _WelcomeToastState extends State<WelcomeToast>
         padding: const EdgeInsets.all(32),
         child: GestureDetector(
           onTap: widget.onDismiss,
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 320),
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 28),
-            decoration: BoxDecoration(
-              color: widget.popupColor ?? Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x2E000000),
-                  offset: Offset(0, 4),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                icon,
-                Text(
-                  widget.message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF111827),
-                    height: 1.5,
-                  ).merge(widget.messageStyle),
-                ),
-              ],
+          child: Material(
+            type: MaterialType.transparency,
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 320),
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 28),
+              decoration: BoxDecoration(
+                color: widget.popupColor ?? Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x2E000000),
+                    offset: Offset(0, 4),
+                    blurRadius: 12,
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  icon,
+                  Text(
+                    widget.message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF111827),
+                      height: 1.5,
+                    ).merge(widget.messageStyle),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

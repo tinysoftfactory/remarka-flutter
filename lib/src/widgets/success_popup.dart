@@ -29,45 +29,48 @@ class SuccessPopup extends StatelessWidget {
         padding: const EdgeInsets.all(32),
         child: GestureDetector(
           onTap: () {},
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 320),
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 28),
-            decoration: BoxDecoration(
-              color: customStyles?.sentMessageContainerColor ?? Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x2E000000),
-                  offset: Offset(0, 4),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                icon ??
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 16),
-                      child: Text(
-                        '✓',
-                        style: TextStyle(
-                          fontSize: 48,
-                          color: Color(0xFF16A34A),
+          child: Material(
+            type: MaterialType.transparency,
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 320),
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 28),
+              decoration: BoxDecoration(
+                color: customStyles?.sentMessageContainerColor ?? Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x2E000000),
+                    offset: Offset(0, 4),
+                    blurRadius: 12,
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  icon ??
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 16),
+                        child: Text(
+                          '✓',
+                          style: TextStyle(
+                            fontSize: 48,
+                            color: Color(0xFF16A34A),
+                          ),
                         ),
                       ),
-                    ),
-                Text(
-                  message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF111827),
-                    height: 1.5,
-                  ).merge(customStyles?.sentMessageTextStyle),
-                ),
-              ],
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF111827),
+                      height: 1.5,
+                    ).merge(customStyles?.sentMessageTextStyle),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

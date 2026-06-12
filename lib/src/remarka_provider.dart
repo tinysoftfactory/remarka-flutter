@@ -54,15 +54,17 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
   final ScreenshotController _screenshotController = ScreenshotController();
 
   _Phase _phase = _Phase.none;
-  bool _formVisible = false;
-  bool _successVisible = false;
+
+  // Reactive flags driven without setState so the form's OverlayEntry (and the
+  // TextEditingControllers it owns) stay mounted while the form is open.
+  final ValueNotifier<bool> _formVisible = ValueNotifier(false);
+  final ValueNotifier<bool> _isOffline = ValueNotifier(false);
 
   ReMarkaConfig? _formConfig;
   String? _screenshotPath;
   String _successMessage = '';
   Widget? _successIcon;
-
-  bool _isOffline = false;
+  bool _successVisible = false;
 
   // Welcome hint state.
   bool _welcomeVisible = false;
@@ -94,12 +96,9 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
 
     final config = inst.configOrNull;
     if (config != null && config.withShake) {
-      _shakeUnsub = RemarkaShakeDetector.subscribe(
-        () {
-          if (ReMarka.isEnabled) _openForm(null);
-        },
-        threshold: config.shakeThreshold,
-      );
+      _shakeUnsub = RemarkaShakeDetector.subscribe(() {
+        if (ReMarka.isEnabled) _openForm(null);
+      }, threshold: config.shakeThreshold);
 
       if (config.withWelcome) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _openWelcome(null));
@@ -128,6 +127,8 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
     _shakeUnsub?.call();
     _netUnsub?.call();
     _clearTimers();
+    _formVisible.dispose();
+    _isOffline.dispose();
     super.dispose();
   }
 
@@ -159,29 +160,27 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
     if (!mounted) return;
 
     _netUnsub?.call();
-    _netUnsub = NetInfoService.subscribe((c) {
-      if (mounted) setState(() => _isOffline = !c);
-    });
+    _netUnsub = NetInfoService.subscribe((c) => _isOffline.value = !c);
+    _isOffline.value = !connected;
 
     setState(() {
       _formConfig = config;
       _screenshotPath = screenshotPath;
-      _isOffline = !connected;
       _phase = _Phase.form;
-      _formVisible = config.showAnimation == ShowAnimation.none;
     });
+    _formVisible.value = config.showAnimation == ShowAnimation.none;
 
     // Animate in on the next frame so the entrance transition runs.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      if (!_formVisible) setState(() => _formVisible = true);
+      _formVisible.value = true;
       ReMarka.instance.emitOpen();
     });
   }
 
   void _closeForm() {
     _clearTimers();
-    setState(() => _formVisible = false);
+    _formVisible.value = false;
     ReMarka.instance.emitClose();
 
     final config = _formConfig;
@@ -234,17 +233,19 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
     final api = ReMarka.instance.getApi();
 
     try {
-      await api.sendFeedback(FeedbackPayload(
-        projectId: base.projectId,
-        tag: config.tag,
-        fields: fields,
-        logs: ReMarka.instance.getLogs(),
-        screenshot: _screenshotPath,
-        userId: await ReMarka.instance.getUserId(),
-        allowResponse: consent.allowResponse,
-        allowHandleResponse: consent.allowHandleResponse,
-        meta: ReMarka.instance.getMeta(),
-      ));
+      await api.sendFeedback(
+        FeedbackPayload(
+          projectId: base.projectId,
+          tag: config.tag,
+          fields: fields,
+          logs: ReMarka.instance.getLogs(),
+          screenshot: _screenshotPath,
+          userId: await ReMarka.instance.getUserId(),
+          allowResponse: consent.allowResponse,
+          allowHandleResponse: consent.allowHandleResponse,
+          meta: ReMarka.instance.getMeta(),
+        ),
+      );
     } catch (error) {
       debugPrint('[ReMarka] Failed to send feedback: $error');
     }
@@ -267,7 +268,8 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
     setState(() {
       _welcomeMessage = message;
       _welcomeIcon = override?.welcomeIcon ?? config.welcomeIcon;
-      _welcomePopupColor = override?.welcomePopupColor ?? config.welcomePopupColor;
+      _welcomePopupColor =
+          override?.welcomePopupColor ?? config.welcomePopupColor;
       _welcomeMessageStyle =
           override?.welcomeMessageStyle ?? config.welcomeMessageStyle;
       _welcomeVisible = true;
@@ -299,8 +301,9 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
 
   @override
   Widget build(BuildContext context) {
-    final currentResponse =
-        _responseQueue.isNotEmpty ? _responseQueue.first : null;
+    final currentResponse = _responseQueue.isNotEmpty
+        ? _responseQueue.first
+        : null;
 
     return Stack(
       textDirection: TextDirection.ltr,
@@ -312,7 +315,22 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
           ),
         ),
         if (_phase == _Phase.form && _formConfig != null)
-          Positioned.fill(child: _buildFormLayer(_formConfig!)),
+          // The form hosts TextFields, which require an Overlay ancestor for
+          // cursor/selection handles. We give it a dedicated Overlay and feed
+          // reactive state through ValueNotifiers so the entry (and its
+          // TextEditingControllers) survives rebuilds.
+          Positioned.fill(
+            child: Overlay(
+              initialEntries: [
+                OverlayEntry(
+                  builder: (_) => ListenableBuilder(
+                    listenable: Listenable.merge([_formVisible, _isOffline]),
+                    builder: (_, __) => _buildFormLayer(_formConfig!),
+                  ),
+                ),
+              ],
+            ),
+          ),
         if (_phase == _Phase.success)
           Positioned.fill(
             child: FadeOverlay(
@@ -350,7 +368,10 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
                 ? const SizedBox.shrink()
                 : ResponseModal(
                     response: currentResponse,
-                    readButtonLabel: ReMarka.instance.configOrNull
+                    readButtonLabel:
+                        ReMarka
+                            .instance
+                            .configOrNull
                             ?.responseReadButtonLabel ??
                         'Read',
                     customStyles: widget.styles,
@@ -378,7 +399,7 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
       showKeyboardImmediately: config.showKeyboardImmediately,
       keyboardDelay: config.keyboardDelay,
       customStyles: widget.styles,
-      isOffline: _isOffline,
+      isOffline: _isOffline.value,
       showResponseConsent: allowResponse && allowHandleResponse,
       responseConsentTitle: config.allowHandleResponseTitle,
       allowResponseDefault: allowResponse,
@@ -392,13 +413,13 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
         return form;
       case ShowAnimation.fade:
         return AnimatedOpacity(
-          opacity: _formVisible ? 1 : 0,
+          opacity: _formVisible.value ? 1 : 0,
           duration: _kFormAnimation,
           child: form,
         );
       case ShowAnimation.slide:
         return AnimatedSlide(
-          offset: _formVisible ? Offset.zero : const Offset(0, 1),
+          offset: _formVisible.value ? Offset.zero : const Offset(0, 1),
           duration: _kFormAnimation,
           curve: Curves.easeOut,
           child: form,
