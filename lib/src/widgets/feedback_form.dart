@@ -50,6 +50,8 @@ class FeedbackForm extends StatefulWidget {
     this.screenshotPath,
     required this.emailPlaceholderText,
     required this.messagePlaceholderText,
+    this.emailDefaultText = '',
+    this.messageDefaultText = '',
     required this.emailLabel,
     required this.messageLabel,
     required this.buttonLabel,
@@ -70,6 +72,8 @@ class FeedbackForm extends StatefulWidget {
   final String? screenshotPath;
   final String emailPlaceholderText;
   final String messagePlaceholderText;
+  final String emailDefaultText;
+  final String messageDefaultText;
   final String emailLabel;
   final String messageLabel;
   final String buttonLabel;
@@ -100,7 +104,10 @@ class _FeedbackFormState extends State<FeedbackForm> {
   void initState() {
     super.initState();
     _controllers = {
-      for (final f in widget.fields) f: TextEditingController(),
+      for (final f in widget.fields)
+        f: TextEditingController(
+          text: f.isEmail ? widget.emailDefaultText : widget.messageDefaultText,
+        ),
     };
     _focusNodes = {
       for (final f in widget.fields) f: FocusNode(),

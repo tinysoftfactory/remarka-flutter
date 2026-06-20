@@ -10,7 +10,7 @@ const int kMaxLogsThreshold = 500;
 const int kDefaultLogsThreshold = 100;
 
 /// Internal library version reported in every submission's `meta`.
-const String kLibraryVersion = '0.2.0';
+const String kLibraryVersion = '0.3.0';
 
 /// The kind of field rendered in the feedback form.
 enum FieldType {
@@ -270,6 +270,8 @@ class ShowOverrideConfig {
     this.showAnimation,
     this.emailPlaceholderText,
     this.messagePlaceholderText,
+    this.emailDefaultText,
+    this.messageDefaultText,
     this.emailLabel,
     this.messageLabel,
     this.buttonLabel,
@@ -302,6 +304,8 @@ class ShowOverrideConfig {
   final ShowAnimation? showAnimation;
   final String? emailPlaceholderText;
   final String? messagePlaceholderText;
+  final String? emailDefaultText;
+  final String? messageDefaultText;
   final String? emailLabel;
   final String? messageLabel;
   final String? buttonLabel;
@@ -343,6 +347,8 @@ class ReMarkaConfig {
     this.showAnimation = ShowAnimation.none,
     this.emailPlaceholderText = 'your@email.com',
     this.messagePlaceholderText = 'Describe the issue or share your thoughts...',
+    this.emailDefaultText = '',
+    this.messageDefaultText = '',
     this.emailLabel = 'E-mail',
     this.messageLabel = 'Message',
     this.buttonLabel = 'Send',
@@ -402,6 +408,12 @@ class ReMarkaConfig {
 
   final String emailPlaceholderText;
   final String messagePlaceholderText;
+
+  /// Pre-filled default value for the email field.
+  final String emailDefaultText;
+
+  /// Pre-filled default value for the message field.
+  final String messageDefaultText;
   final String emailLabel;
   final String messageLabel;
   final String buttonLabel;
@@ -473,6 +485,8 @@ class ReMarkaConfig {
       showAnimation: o.showAnimation ?? showAnimation,
       emailPlaceholderText: o.emailPlaceholderText ?? emailPlaceholderText,
       messagePlaceholderText: o.messagePlaceholderText ?? messagePlaceholderText,
+      emailDefaultText: o.emailDefaultText ?? emailDefaultText,
+      messageDefaultText: o.messageDefaultText ?? messageDefaultText,
       emailLabel: o.emailLabel ?? emailLabel,
       messageLabel: o.messageLabel ?? messageLabel,
       buttonLabel: o.buttonLabel ?? buttonLabel,

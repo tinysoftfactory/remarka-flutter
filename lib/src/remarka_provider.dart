@@ -393,6 +393,8 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
       screenshotPath: _screenshotPath,
       emailPlaceholderText: config.emailPlaceholderText,
       messagePlaceholderText: config.messagePlaceholderText,
+      emailDefaultText: config.emailDefaultText,
+      messageDefaultText: config.messageDefaultText,
       emailLabel: config.emailLabel,
       messageLabel: config.messageLabel,
       buttonLabel: config.buttonLabel,

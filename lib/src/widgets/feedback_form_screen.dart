@@ -14,6 +14,8 @@ class FeedbackFormScreen extends StatelessWidget {
     this.screenshotPath,
     required this.emailPlaceholderText,
     required this.messagePlaceholderText,
+    required this.emailDefaultText,
+    required this.messageDefaultText,
     required this.emailLabel,
     required this.messageLabel,
     required this.buttonLabel,
@@ -34,6 +36,8 @@ class FeedbackFormScreen extends StatelessWidget {
   final String? screenshotPath;
   final String emailPlaceholderText;
   final String messagePlaceholderText;
+  final String emailDefaultText;
+  final String messageDefaultText;
   final String emailLabel;
   final String messageLabel;
   final String buttonLabel;
@@ -59,6 +63,8 @@ class FeedbackFormScreen extends StatelessWidget {
           screenshotPath: screenshotPath,
           emailPlaceholderText: emailPlaceholderText,
           messagePlaceholderText: messagePlaceholderText,
+          emailDefaultText: emailDefaultText,
+          messageDefaultText: messageDefaultText,
           emailLabel: emailLabel,
           messageLabel: messageLabel,
           buttonLabel: buttonLabel,
