@@ -92,7 +92,8 @@ class FeedbackForm extends StatefulWidget {
   State<FeedbackForm> createState() => _FeedbackFormState();
 }
 
-class _FeedbackFormState extends State<FeedbackForm> {
+class _FeedbackFormState extends State<FeedbackForm>
+    with WidgetsBindingObserver {
   late final Map<FieldType, TextEditingController> _controllers;
   late final Map<FieldType, FocusNode> _focusNodes;
   final Map<FieldType, bool> _errors = {};
@@ -103,6 +104,7 @@ class _FeedbackFormState extends State<FeedbackForm> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _controllers = {
       for (final f in widget.fields)
         f: TextEditingController(
@@ -138,8 +140,27 @@ class _FeedbackFormState extends State<FeedbackForm> {
     });
   }
 
+  /// Fires when the system metrics change, including when the soft keyboard
+  /// opens or closes. On Android the hardware/system back button dismisses the
+  /// keyboard without removing focus from the [TextField], so the focus
+  /// listeners never fire and the button state gets stuck. Detect the keyboard
+  /// closing here and drop focus so the existing listeners run.
+  @override
+  void didChangeMetrics() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+      if (keyboardOpen) return;
+      final hasAnyFocus = _focusNodes.values.any((n) => n.hasFocus);
+      if (hasAnyFocus) {
+        FocusScope.of(context).unfocus();
+      }
+    });
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     for (final c in _controllers.values) {
       c.dispose();
     }
