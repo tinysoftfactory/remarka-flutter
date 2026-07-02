@@ -100,6 +100,7 @@ class _FeedbackFormState extends State<FeedbackForm>
   bool _loading = false;
   bool _textFieldFocused = false;
   bool _responseAllowed = true;
+  bool _keyboardWasOpen = false;
 
   @override
   void initState() {
@@ -143,14 +144,23 @@ class _FeedbackFormState extends State<FeedbackForm>
   /// Fires when the system metrics change, including when the soft keyboard
   /// opens or closes. On Android the hardware/system back button dismisses the
   /// keyboard without removing focus from the [TextField], so the focus
-  /// listeners never fire and the button state gets stuck. Detect the keyboard
-  /// closing here and drop focus so the existing listeners run.
+  /// listeners never fire and the button state gets stuck.
+  ///
+  /// We only drop focus on a real open→closed transition. Reacting to a bare
+  /// "keyboard not open" reading would also fire during the opening animation
+  /// (when the inset is still ramping up from 0), which would immediately
+  /// unfocus the field the user just tapped.
   @override
   void didChangeMetrics() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
-      if (keyboardOpen) return;
+      if (keyboardOpen) {
+        _keyboardWasOpen = true;
+        return;
+      }
+      if (!_keyboardWasOpen) return;
+      _keyboardWasOpen = false;
       final hasAnyFocus = _focusNodes.values.any((n) => n.hasFocus);
       if (hasAnyFocus) {
         FocusScope.of(context).unfocus();

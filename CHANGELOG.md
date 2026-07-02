@@ -1,4 +1,4 @@
-## 0.4.0
+## 0.4.1
 
 - Add `emailDefaultText` and `messageDefaultText` config options to pre-fill the email and message fields.
 - Fix button state on Android when the keyboard is dismissed with the system back button: the submit button now reappears and the inline send button hides correctly.
