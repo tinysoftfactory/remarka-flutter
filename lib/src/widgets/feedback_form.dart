@@ -98,7 +98,6 @@ class _FeedbackFormState extends State<FeedbackForm>
   late final Map<FieldType, FocusNode> _focusNodes;
   final Map<FieldType, bool> _errors = {};
   bool _loading = false;
-  bool _textFieldFocused = false;
   bool _responseAllowed = true;
   bool _keyboardWasOpen = false;
 
@@ -115,17 +114,6 @@ class _FeedbackFormState extends State<FeedbackForm>
     _focusNodes = {
       for (final f in widget.fields) f: FocusNode(),
     };
-
-    for (final f in widget.fields) {
-      if (f.isText) {
-        _focusNodes[f]!.addListener(() {
-          final focused = _focusNodes[f]!.hasFocus;
-          if (focused != _textFieldFocused) {
-            setState(() => _textFieldFocused = focused);
-          }
-        });
-      }
-    }
 
     _scheduleAutoFocus();
   }
@@ -249,85 +237,122 @@ class _FeedbackFormState extends State<FeedbackForm>
   @override
   Widget build(BuildContext context) {
     final styles = widget.customStyles;
+    final padding = (styles?.containerPadding ??
+            const EdgeInsets.fromLTRB(20, 20, 20, 40))
+        .resolve(Directionality.of(context));
+    // The form lives in a bare Overlay layer, so nothing resizes it when the
+    // soft keyboard appears. Reserving the keyboard inset here lifts the
+    // pinned footer (consent + submit button) above the keyboard and lets the
+    // scrollable body shrink instead.
+    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return ListView(
-      padding: styles?.containerPadding ??
-          const EdgeInsets.fromLTRB(20, 20, 20, 40),
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    // Tapping anywhere outside a text field dismisses the keyboard. The tap
+    // gesture only wins the arena when no child (text field, button, checkbox)
+    // claims it, so interactive children keep working as before.
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: keyboardInset),
+        child: Column(
           children: [
             Expanded(
-              child: widget.title != null
-                  ? Text(
-                      widget.title!,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
-                      ).merge(styles?.titleStyle),
-                    )
-                  : const SizedBox.shrink(),
+              child: ListView(
+                padding: padding.copyWith(bottom: 8),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: widget.title != null
+                            ? Text(
+                                widget.title!,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF111827),
+                                ).merge(styles?.titleStyle),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      const SizedBox(width: 12),
+                      GestureDetector(
+                        onTap: widget.onClose,
+                        behavior: HitTestBehavior.opaque,
+                        child: const Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Text(
+                            '✕',
+                            style: TextStyle(
+                                fontSize: 18, color: Color(0xFF6B7280)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  if (widget.screenshotPath != null) ...[
+                    const Text(
+                      'Screenshot',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF374151),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 180,
+                        width: double.infinity,
+                        color: const Color(0xFFF3F4F6),
+                        child: Image.file(
+                          File(widget.screenshotPath!),
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                  ...widget.fields.map(_buildField),
+                ],
+              ),
             ),
-            const SizedBox(width: 12),
-            GestureDetector(
-              onTap: widget.onClose,
-              behavior: HitTestBehavior.opaque,
-              child: const Padding(
-                padding: EdgeInsets.all(4),
-                child: Text(
-                  '✕',
-                  style: TextStyle(fontSize: 18, color: Color(0xFF6B7280)),
-                ),
+            // Consent and submit stay pinned above the keyboard instead of
+            // being hidden while a field is focused.
+            Padding(
+              padding: EdgeInsets.only(
+                left: padding.left,
+                right: padding.right,
+                bottom: keyboardInset > 0 ? 12 : padding.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.showResponseConsent) _buildConsentRow(styles),
+                  if (widget.isOffline)
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        'Check your Internet connection',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFFDC2626),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  _buildSubmitButton(styles),
+                ],
               ),
             ),
           ],
         ),
-        const SizedBox(height: 20),
-        if (widget.screenshotPath != null) ...[
-          const Text(
-            'Screenshot',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF374151),
-            ),
-          ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              height: 180,
-              width: double.infinity,
-              color: const Color(0xFFF3F4F6),
-              child: Image.file(
-                File(widget.screenshotPath!),
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
-        ...widget.fields.map(_buildField),
-        if (!_textFieldFocused) ...[
-          if (widget.showResponseConsent) _buildConsentRow(styles),
-          if (widget.isOffline)
-            const Padding(
-              padding: EdgeInsets.only(bottom: 8),
-              child: Text(
-                'Check your Internet connection',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFFDC2626),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          _buildSubmitButton(styles),
-        ],
-      ],
+      ),
     );
   }
 
@@ -358,9 +383,6 @@ class _FeedbackFormState extends State<FeedbackForm>
       labelStyle: styles?.labelStyle,
       borderColor: styles?.inputBorderColor,
       onChanged: (_) => _clearErrorOnEdit(field),
-      showInlineSubmit: _textFieldFocused,
-      inlineSubmitLoading: _loading,
-      onInlineSubmit: _handleSubmit,
     );
   }
 

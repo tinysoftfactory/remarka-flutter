@@ -1,3 +1,9 @@
+## 0.5.0
+
+- The consent checkbox and the submit button now stay visible while the keyboard is open; the form lifts them above the keyboard instead of hiding them.
+- Remove the inline send button from the message field (`MessageField.showInlineSubmit`, `inlineSubmitLoading` and `onInlineSubmit` are gone).
+- Tapping empty space in the form dismisses the keyboard.
+
 ## 0.4.1
 
 - Add `emailDefaultText` and `messageDefaultText` config options to pre-fill the email and message fields.
