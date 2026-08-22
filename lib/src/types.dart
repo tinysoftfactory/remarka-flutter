@@ -10,7 +10,7 @@ const int kMaxLogsThreshold = 500;
 const int kDefaultLogsThreshold = 100;
 
 /// Internal library version reported in every submission's `meta`.
-const String kLibraryVersion = '0.4.1';
+const String kLibraryVersion = '0.5.0';
 
 /// The kind of field rendered in the feedback form.
 enum FieldType {
