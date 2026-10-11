@@ -10,7 +10,7 @@ const int kMaxLogsThreshold = 500;
 const int kDefaultLogsThreshold = 100;
 
 /// Internal library version reported in every submission's `meta`.
-const String kLibraryVersion = '0.5.0';
+const String kLibraryVersion = '0.5.1';
 
 /// The kind of field rendered in the feedback form.
 enum FieldType {
@@ -275,6 +275,10 @@ class ShowOverrideConfig {
     this.emailLabel,
     this.messageLabel,
     this.buttonLabel,
+    this.emailErrorText,
+    this.requiredErrorText,
+    this.screenshotLabel,
+    this.offlineWarningText,
     this.tag,
     this.meta,
     this.allowResponse,
@@ -309,6 +313,10 @@ class ShowOverrideConfig {
   final String? emailLabel;
   final String? messageLabel;
   final String? buttonLabel;
+  final String? emailErrorText;
+  final String? requiredErrorText;
+  final String? screenshotLabel;
+  final String? offlineWarningText;
   final String? tag;
   final Map<String, Object?>? meta;
   final bool? allowResponse;
@@ -352,6 +360,10 @@ class ReMarkaConfig {
     this.emailLabel = 'E-mail',
     this.messageLabel = 'Message',
     this.buttonLabel = 'Send',
+    this.emailErrorText = 'Please enter a valid email address',
+    this.requiredErrorText = 'This field is required',
+    this.screenshotLabel = 'Screenshot',
+    this.offlineWarningText = 'Check your Internet connection',
     this.tag = 'feedback',
     this.meta = const {},
     this.allowResponse = true,
@@ -417,6 +429,18 @@ class ReMarkaConfig {
   final String emailLabel;
   final String messageLabel;
   final String buttonLabel;
+
+  /// Error shown under an email field when the address is invalid or missing.
+  final String emailErrorText;
+
+  /// Error shown under a required message field left empty.
+  final String requiredErrorText;
+
+  /// Label shown above the captured screenshot preview.
+  final String screenshotLabel;
+
+  /// Warning shown above the submit button while the device is offline.
+  final String offlineWarningText;
 
   /// Tag sent with every submission for categorisation.
   final String tag;
@@ -490,6 +514,10 @@ class ReMarkaConfig {
       emailLabel: o.emailLabel ?? emailLabel,
       messageLabel: o.messageLabel ?? messageLabel,
       buttonLabel: o.buttonLabel ?? buttonLabel,
+      emailErrorText: o.emailErrorText ?? emailErrorText,
+      requiredErrorText: o.requiredErrorText ?? requiredErrorText,
+      screenshotLabel: o.screenshotLabel ?? screenshotLabel,
+      offlineWarningText: o.offlineWarningText ?? offlineWarningText,
       tag: o.tag ?? tag,
       meta: o.meta ?? meta,
       allowResponse: o.allowResponse ?? allowResponse,

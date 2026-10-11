@@ -1,3 +1,9 @@
+## 0.5.1
+
+- Add `emailErrorText`, `requiredErrorText`, `screenshotLabel` and `offlineWarningText` config options so every form text can be localized.
+- Add `ReMarka.updateConfig(ShowOverrideConfig)` to change the base config (e.g. texts after a language switch) without calling `init()` again.
+- The moderator-response "read" button now uses the current config plus the last `show()` override instead of the value captured at `init()`.
+
 ## 0.5.0
 
 - The consent checkbox and the submit button now stay visible while the keyboard is open; the form lifts them above the keyboard instead of hiding them.

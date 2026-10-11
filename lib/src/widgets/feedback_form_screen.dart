@@ -19,6 +19,10 @@ class FeedbackFormScreen extends StatelessWidget {
     required this.emailLabel,
     required this.messageLabel,
     required this.buttonLabel,
+    required this.emailErrorText,
+    required this.requiredErrorText,
+    required this.screenshotLabel,
+    required this.offlineWarningText,
     required this.showKeyboardImmediately,
     required this.keyboardDelay,
     this.customStyles,
@@ -41,6 +45,10 @@ class FeedbackFormScreen extends StatelessWidget {
   final String emailLabel;
   final String messageLabel;
   final String buttonLabel;
+  final String emailErrorText;
+  final String requiredErrorText;
+  final String screenshotLabel;
+  final String offlineWarningText;
   final bool showKeyboardImmediately;
   final Duration keyboardDelay;
   final ReMarkaStyles? customStyles;
@@ -68,6 +76,10 @@ class FeedbackFormScreen extends StatelessWidget {
           emailLabel: emailLabel,
           messageLabel: messageLabel,
           buttonLabel: buttonLabel,
+          emailErrorText: emailErrorText,
+          requiredErrorText: requiredErrorText,
+          screenshotLabel: screenshotLabel,
+          offlineWarningText: offlineWarningText,
           showKeyboardImmediately: showKeyboardImmediately,
           keyboardDelay: keyboardDelay,
           customStyles: customStyles,

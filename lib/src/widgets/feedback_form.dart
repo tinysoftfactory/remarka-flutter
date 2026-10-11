@@ -55,6 +55,10 @@ class FeedbackForm extends StatefulWidget {
     required this.emailLabel,
     required this.messageLabel,
     required this.buttonLabel,
+    this.emailErrorText = 'Please enter a valid email address',
+    this.requiredErrorText = 'This field is required',
+    this.screenshotLabel = 'Screenshot',
+    this.offlineWarningText = 'Check your Internet connection',
     this.showKeyboardImmediately = true,
     this.keyboardDelay = const Duration(milliseconds: 1500),
     this.customStyles,
@@ -77,6 +81,10 @@ class FeedbackForm extends StatefulWidget {
   final String emailLabel;
   final String messageLabel;
   final String buttonLabel;
+  final String emailErrorText;
+  final String requiredErrorText;
+  final String screenshotLabel;
+  final String offlineWarningText;
   final bool showKeyboardImmediately;
   final Duration keyboardDelay;
   final ReMarkaStyles? customStyles;
@@ -294,9 +302,9 @@ class _FeedbackFormState extends State<FeedbackForm>
                   ),
                   const SizedBox(height: 20),
                   if (widget.screenshotPath != null) ...[
-                    const Text(
-                      'Screenshot',
-                      style: TextStyle(
+                    Text(
+                      widget.screenshotLabel,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF374151),
@@ -334,12 +342,12 @@ class _FeedbackFormState extends State<FeedbackForm>
                 children: [
                   if (widget.showResponseConsent) _buildConsentRow(styles),
                   if (widget.isOffline)
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        'Check your Internet connection',
+                        widget.offlineWarningText,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFFDC2626),
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -366,6 +374,7 @@ class _FeedbackFormState extends State<FeedbackForm>
         hasError: _errors[field] ?? false,
         placeholder: widget.emailPlaceholderText,
         label: widget.emailLabel,
+        errorText: widget.emailErrorText,
         inputStyle: styles?.inputStyle,
         labelStyle: styles?.labelStyle,
         borderColor: styles?.inputBorderColor,
@@ -379,6 +388,7 @@ class _FeedbackFormState extends State<FeedbackForm>
       hasError: _errors[field] ?? false,
       placeholder: widget.messagePlaceholderText,
       label: widget.messageLabel,
+      errorText: widget.requiredErrorText,
       inputStyle: styles?.inputStyle,
       labelStyle: styles?.labelStyle,
       borderColor: styles?.inputBorderColor,

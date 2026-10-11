@@ -93,6 +93,24 @@ class ReMarka {
     }
   }
 
+  /// Updates the base config in place, without a new [init]. Use it to change
+  /// texts at runtime (e.g. after a language switch); the next `show()` and
+  /// any moderator-response window pick up the new values. Shake settings
+  /// (`withShake`, `shakeThreshold`) are read by [ReMarkaProvider] only on
+  /// mount and are not re-applied here.
+  static void updateConfig(ShowOverrideConfig override) {
+    final config = instance._config;
+    if (config == null) return;
+    final next = config.applyOverride(override);
+    instance._config = next.logsThreshold > kMaxLogsThreshold
+        ? next.applyOverride(
+            const ShowOverrideConfig(logsThreshold: kMaxLogsThreshold))
+        : next;
+    if (override.meta != null) {
+      instance._userMeta = Map<String, Object?>.from(override.meta!);
+    }
+  }
+
   /// Appends an entry to the in-memory rolling log buffer (capped at
   /// `logsThreshold`). Logs are attached to every submission and cleared after
   /// each successful send.

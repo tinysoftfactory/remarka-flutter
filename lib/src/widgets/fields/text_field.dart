@@ -9,6 +9,7 @@ class MessageField extends StatelessWidget {
     this.required = false,
     this.hasError = false,
     this.placeholder = 'Describe the issue or share your thoughts...',
+    this.errorText = 'This field is required',
     this.label = 'Message',
     this.inputStyle,
     this.labelStyle,
@@ -22,6 +23,7 @@ class MessageField extends StatelessWidget {
   final bool hasError;
   final String placeholder;
   final String label;
+  final String errorText;
   final TextStyle? inputStyle;
   final TextStyle? labelStyle;
   final Color? borderColor;
@@ -79,11 +81,11 @@ class MessageField extends StatelessWidget {
             ),
           ),
           if (hasError)
-            const Padding(
-              padding: EdgeInsets.only(top: 4),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
               child: Text(
-                'This field is required',
-                style: TextStyle(fontSize: 13, color: Color(0xFFEF4444)),
+                errorText,
+                style: const TextStyle(fontSize: 13, color: Color(0xFFEF4444)),
               ),
             ),
         ],

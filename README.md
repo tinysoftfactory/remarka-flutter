@@ -100,6 +100,10 @@ class MyApp extends StatelessWidget {
 | `emailLabel`               | `String`          | `E-mail`                                    |
 | `messageLabel`             | `String`          | `Message`                                   |
 | `buttonLabel`              | `String`          | `Send`                                      |
+| `emailErrorText`           | `String`          | `Please enter a valid email address`        |
+| `requiredErrorText`        | `String`          | `This field is required`                    |
+| `screenshotLabel`          | `String`          | `Screenshot`                                |
+| `offlineWarningText`       | `String`          | `Check your Internet connection`            |
 | `emailPlaceholderText`     | `String`          | `your@email.com`                            |
 | `messagePlaceholderText`   | `String`          | `Describe the issue or share your thoughts...` |
 | `showKeyboardImmediately`  | `bool`            | `true`                                      |
@@ -148,6 +152,20 @@ ReMarka.show(const ShowOverrideConfig(
   showAnimation: ShowAnimation.fade,
   buttonLabel: 'Report',
   withScreenshot: true,
+));
+```
+
+### `ReMarka.updateConfig(override)`
+
+Changes the base config in place without a new `init()` — handy for switching
+texts after the user changes the app language. The next `show()` and any
+moderator-response window use the new values. Shake settings are not
+re-applied.
+
+```dart
+ReMarka.updateConfig(const ShowOverrideConfig(
+  buttonLabel: 'Отправить',
+  responseReadButtonLabel: 'Понятно',
 ));
 ```
 

@@ -61,6 +61,11 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
   final ValueNotifier<bool> _isOffline = ValueNotifier(false);
 
   ReMarkaConfig? _formConfig;
+
+  /// Override passed to the most recent `show()`. It is re-applied on top of
+  /// the current base config so texts like the response "read" label follow
+  /// runtime changes (e.g. a language switch) without a new `init()`.
+  ShowOverrideConfig? _lastShowOverride;
   String? _screenshotPath;
   String _successMessage = '';
   Widget? _successIcon;
@@ -146,6 +151,7 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
     final base = ReMarka.instance.configOrNull;
     if (base == null) return;
     final config = base.applyOverride(override);
+    _lastShowOverride = override;
 
     String? screenshotPath;
     if (config.withScreenshot) {
@@ -369,10 +375,9 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
                 : ResponseModal(
                     response: currentResponse,
                     readButtonLabel:
-                        ReMarka
-                            .instance
-                            .configOrNull
-                            ?.responseReadButtonLabel ??
+                        ReMarka.instance.configOrNull
+                            ?.applyOverride(_lastShowOverride)
+                            .responseReadButtonLabel ??
                         'Read',
                     customStyles: widget.styles,
                     onRead: _handleResponseRead,
@@ -398,6 +403,10 @@ class _ReMarkaProviderState extends State<ReMarkaProvider>
       emailLabel: config.emailLabel,
       messageLabel: config.messageLabel,
       buttonLabel: config.buttonLabel,
+      emailErrorText: config.emailErrorText,
+      requiredErrorText: config.requiredErrorText,
+      screenshotLabel: config.screenshotLabel,
+      offlineWarningText: config.offlineWarningText,
       showKeyboardImmediately: config.showKeyboardImmediately,
       keyboardDelay: config.keyboardDelay,
       customStyles: widget.styles,

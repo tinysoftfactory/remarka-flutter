@@ -9,6 +9,7 @@ class EmailField extends StatelessWidget {
     this.required = false,
     this.hasError = false,
     this.placeholder = 'your@email.com',
+    this.errorText = 'Please enter a valid email address',
     this.label = 'E-mail',
     this.inputStyle,
     this.labelStyle,
@@ -22,6 +23,7 @@ class EmailField extends StatelessWidget {
   final bool hasError;
   final String placeholder;
   final String label;
+  final String errorText;
   final TextStyle? inputStyle;
   final TextStyle? labelStyle;
   final Color? borderColor;
@@ -81,11 +83,11 @@ class EmailField extends StatelessWidget {
             ),
           ),
           if (hasError)
-            const Padding(
-              padding: EdgeInsets.only(top: 4),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
               child: Text(
-                'Please enter a valid email address',
-                style: TextStyle(fontSize: 13, color: Color(0xFFEF4444)),
+                errorText,
+                style: const TextStyle(fontSize: 13, color: Color(0xFFEF4444)),
               ),
             ),
         ],
